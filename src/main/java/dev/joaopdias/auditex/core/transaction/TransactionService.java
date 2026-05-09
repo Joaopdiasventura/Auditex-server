@@ -1,6 +1,10 @@
 package dev.joaopdias.auditex.core.transaction;
 
+import java.time.Instant;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import dev.joaopdias.auditex.core.transaction.dto.CreateTransactionDto;
@@ -10,6 +14,7 @@ import dev.joaopdias.auditex.core.transaction.enums.TransactionStatus;
 import dev.joaopdias.auditex.shared.services.HashService;
 import dev.joaopdias.auditex.shared.services.SignatureService;
 import jakarta.transaction.Transactional;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 @Service
@@ -69,15 +74,31 @@ public class TransactionService {
 
             return this.toResponse(saved);
 
-        } catch (Exception e) {
+        } catch (IllegalStateException | JacksonException e) {
             throw new IllegalStateException(e.getMessage());
         }
+    }
+
+    public void saveAll(List<LedgerTransaction> transactions) {
+        transactionRepository.saveAll(transactions);
+    }
+
+    public List<LedgerTransaction> findByStatusOrderByCreatedAtAsc(TransactionStatus status, Pageable pageable) {
+        return transactionRepository.findByStatusOrderByCreatedAtAsc(status, pageable);
     }
 
     public TransactionResponseDto findByHash(String hash) {
         LedgerTransaction transaction = this.transactionRepository.findByHash(hash)
                 .orElseThrow(() -> new IllegalStateException("Transaction not found"));
         return this.toResponse(transaction);
+    }
+
+    public long countByStatus(TransactionStatus status) {
+        return transactionRepository.countByStatus(status);
+    }
+
+    public boolean existsByStatusAndCreatedAtBefore(TransactionStatus status, Instant createdAt) {
+        return transactionRepository.existsByStatusAndCreatedAtBefore(status, createdAt);
     }
 
     private TransactionResponseDto toResponse(LedgerTransaction transaction) {
@@ -96,7 +117,7 @@ public class TransactionService {
                     transaction.createdAt,
                     transaction.minedAt,
                     transaction.blockId);
-        } catch (Exception exception) {
+        } catch (JacksonException exception) {
             throw new IllegalStateException(exception.getMessage());
         }
 
