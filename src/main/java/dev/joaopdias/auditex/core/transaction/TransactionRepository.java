@@ -25,6 +25,9 @@ public interface TransactionRepository extends JpaRepository<LedgerTransaction, 
     
     long countByStatus(TransactionStatus status);
 
+    long countByBlockId(UUID blockId);
+
     List<LedgerTransaction> findByStatusOrderByCreatedAtAsc(TransactionStatus status, Pageable pageable);
 
+    List<LedgerTransaction> findByBlockIdOrderByBlockTransactionIndexAsc(UUID blockId, Pageable pageable);
 }

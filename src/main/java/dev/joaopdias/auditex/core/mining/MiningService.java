@@ -79,10 +79,13 @@ public class MiningService {
 
         Instant minedAt = Instant.now();
 
-        for (LedgerTransaction transaction : pendingTransactions) {
+        for (int i = 0; i < pendingTransactions.size(); i++) {
+            LedgerTransaction transaction = pendingTransactions.get(i);
+
             transaction.setStatus(TransactionStatus.MINED);
             transaction.setBlockId(block.getId());
             transaction.setMinedAt(minedAt);
+            transaction.setBlockTransactionIndex(i);
         }
 
         transactionService.saveAll(pendingTransactions);

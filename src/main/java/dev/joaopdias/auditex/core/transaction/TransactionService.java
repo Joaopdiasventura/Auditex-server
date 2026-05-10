@@ -2,6 +2,7 @@ package dev.joaopdias.auditex.core.transaction;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -87,6 +88,10 @@ public class TransactionService {
         return transactionRepository.findByStatusOrderByCreatedAtAsc(status, pageable);
     }
 
+    public List<LedgerTransaction> findByBlockIdOrderByBlockTransactionIndexAsc(UUID blockId, Pageable pageable) {
+        return transactionRepository.findByBlockIdOrderByBlockTransactionIndexAsc(blockId, pageable);
+    }
+
     public TransactionResponseDto findByHash(String hash) {
         LedgerTransaction transaction = this.transactionRepository.findByHash(hash)
                 .orElseThrow(() -> new IllegalStateException("Transaction not found"));
@@ -95,6 +100,10 @@ public class TransactionService {
 
     public long countByStatus(TransactionStatus status) {
         return transactionRepository.countByStatus(status);
+    }
+
+    public long countByBlockId(UUID blockId) {
+        return transactionRepository.countByBlockId(blockId);
     }
 
     public boolean existsByStatusAndCreatedAtBefore(TransactionStatus status, Instant createdAt) {

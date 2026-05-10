@@ -34,12 +34,14 @@ import lombok.Setter;
                 @Index(name = "idx_ledger_transactions_status", columnList = "status"),
                 @Index(name = "idx_ledger_transactions_status_created_at", columnList = "status, created_at"),
                 @Index(name = "idx_ledger_transactions_block_id", columnList = "block_id"),
+                @Index(name = "idx_ledger_transactions_block_id_block_transaction_index", columnList = "block_id, block_transaction_index"),
                 @Index(name = "idx_ledger_transactions_public_key", columnList = "public_key"),
                 @Index(name = "idx_ledger_transactions_public_key_created_at", columnList = "public_key, created_at")
         },
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_ledger_transactions_hash", columnNames = "hash"),
-                @UniqueConstraint(name = "uk_ledger_transactions_public_key_nonce", columnNames = {"public_key", "nonce"})
+                @UniqueConstraint(name = "uk_ledger_transactions_public_key_nonce", columnNames = {"public_key", "nonce"}),
+                @UniqueConstraint(name = "uk_ledger_transactions_block_id_block_transaction_index", columnNames = {"block_id", "block_transaction_index"})
         }
 )
 public class LedgerTransaction {
@@ -80,12 +82,13 @@ public class LedgerTransaction {
     @Column(name = "block_id")
     public UUID blockId;
 
+    @Column(name = "block_transaction_index")
+    public Integer blockTransactionIndex;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = Instant.now();
 
-        if (this.status == null) {
-            this.status = TransactionStatus.PENDING;
-        }
+        if (this.status == null) this.status = TransactionStatus.PENDING;
     }
 }
