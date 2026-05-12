@@ -8,6 +8,7 @@ services:
       DATABASE_URL: jdbc:postgresql://db:5432/auditex
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: postgres
+      RABBITMQ_URL: amqp://user:user@message-br:5672/
       JPA_DDL_AUTO: update
       JPA_SHOW_SQL: true
       JPA_FORMAT_SQL: true
@@ -15,6 +16,8 @@ services:
       - 8080:8080
     depends_on:
       db:
+        condition: service_healthy
+      message-br:
         condition: service_healthy
 
   db:
