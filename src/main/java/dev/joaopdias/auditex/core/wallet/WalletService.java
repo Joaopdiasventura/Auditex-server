@@ -11,6 +11,7 @@ import dev.joaopdias.auditex.core.wallet.dto.CreateWalletDto;
 import dev.joaopdias.auditex.core.wallet.dto.GeneratedKeyPairDto;
 import dev.joaopdias.auditex.core.wallet.dto.ReturnWalletDto;
 import dev.joaopdias.auditex.core.wallet.entities.Wallet;
+import dev.joaopdias.auditex.shared.exceptions.InternalApplicationException;
 import dev.joaopdias.auditex.shared.services.HashService;
 import jakarta.transaction.Transactional;
 
@@ -62,7 +63,7 @@ public class WalletService {
 
             return new GeneratedKeyPairDto(publicKey, privateKey);
         } catch (Exception exception) {
-            throw new IllegalStateException("Could not generate key pair", exception);
+            throw new InternalApplicationException("Não foi possível gerar carteira", exception);
         }
     }
 

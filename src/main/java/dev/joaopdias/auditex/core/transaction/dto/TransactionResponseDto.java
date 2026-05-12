@@ -16,5 +16,6 @@ public record TransactionResponseDto(
         String nonce,
         Instant createdAt,
         Instant minedAt,
-        UUID blockId) {
+        UUID blockId,
+        Integer blockTransactionIndex) {
 }

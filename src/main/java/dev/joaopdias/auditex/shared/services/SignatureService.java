@@ -11,6 +11,8 @@ import java.util.Base64;
 
 import org.springframework.stereotype.Service;
 
+import dev.joaopdias.auditex.shared.exceptions.InvalidSignatureException;
+
 @Service
 public class SignatureService {
 
@@ -24,7 +26,7 @@ public class SignatureService {
 
             return Base64.getEncoder().encodeToString(signature.sign());
         } catch (Exception exception) {
-            throw new IllegalStateException("Could not sign content", exception);
+            throw new InvalidSignatureException("Não foi possível assinar conteúdo", exception);
         }
     }
 
@@ -52,7 +54,7 @@ public class SignatureService {
 
             return keyFactory.generatePublic(keySpec);
         } catch (Exception exception) {
-            throw new IllegalStateException("Invalid public key", exception);
+            throw new InvalidSignatureException("PublicKey inválida", exception);
         }
     }
 
@@ -64,7 +66,7 @@ public class SignatureService {
 
             return keyFactory.generatePrivate(keySpec);
         } catch (Exception exception) {
-            throw new IllegalStateException("Invalid private key", exception);
+            throw new InvalidSignatureException("PrivateKey inválida", exception);
         }
     }
 }

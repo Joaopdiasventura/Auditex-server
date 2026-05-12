@@ -7,5 +7,6 @@ public record ValidateResponseDto(
         int blocksChecked,
         int transactionsChecked,
         UUID brokenAtBlock,
+        UUID brokenAtTransaction,
         String reason
     ) {}

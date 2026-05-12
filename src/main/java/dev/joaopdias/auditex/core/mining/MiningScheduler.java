@@ -16,7 +16,7 @@ public class MiningScheduler {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(initialDelay = 1000, fixedDelay = 5000)
     public void scheduleMining() {
         MiningRequestDto message = new MiningRequestDto(
                 UUID.randomUUID(),

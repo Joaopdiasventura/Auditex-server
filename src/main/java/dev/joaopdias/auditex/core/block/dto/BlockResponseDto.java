@@ -12,5 +12,6 @@ public record BlockResponseDto(
         Long nonce,
         Integer difficulty,
         Instant createdAt,
-        Instant minedAt
+        Instant minedAt,
+        long transactionsCount
     ) {}

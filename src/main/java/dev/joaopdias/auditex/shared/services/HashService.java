@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+import dev.joaopdias.auditex.shared.exceptions.InternalApplicationException;
+
 @Service
 public class HashService {
     public String sha256(String value) {
@@ -19,7 +21,7 @@ public class HashService {
 
             return result.toString();
         } catch (Exception exception) {
-            throw new IllegalStateException("Could not calculate hash", exception);
+            throw new InternalApplicationException("Não foi possível calcular hash", exception);
         }
     }
 }

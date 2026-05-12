@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import dev.joaopdias.auditex.core.block.BlockService;
@@ -22,6 +21,7 @@ public class MiningService {
 
     private static final Integer DEFAULT_DIFFICULTY = 4;
     private static final Integer MAX_TRANSACTIONS_PER_BLOCK = 100;
+    private static final Integer MAX_PENDING_TRANSACTION_AGE_SECONDS = 15;
 
     @Autowired
     private TransactionService transactionService;
@@ -38,7 +38,6 @@ public class MiningService {
         long pendingCount = transactionService.countByStatus(TransactionStatus.PENDING);
 
         if (pendingCount == 0) return;
-        
 
         if (pendingCount >= MAX_TRANSACTIONS_PER_BLOCK) {
             mineBlock(MAX_TRANSACTIONS_PER_BLOCK);
@@ -47,18 +46,19 @@ public class MiningService {
 
         boolean hasOldTransactions = transactionService.existsByStatusAndCreatedAtBefore(
                 TransactionStatus.PENDING,
-                Instant.now().minusSeconds(300));
+                Instant.now().minusSeconds(MAX_PENDING_TRANSACTION_AGE_SECONDS));
 
         if (hasOldTransactions) mineBlock(MAX_TRANSACTIONS_PER_BLOCK);
-        
     }
 
     private void mineBlock(int limit) {
         List<LedgerTransaction> pendingTransactions = transactionService
-                .findByStatusOrderByCreatedAtAsc(TransactionStatus.PENDING, PageRequest.of(0, limit));
+                .findByStatusOrderByCreatedAtAscForUpdateSkipLocked(TransactionStatus.PENDING, limit);
 
         if (pendingTransactions.isEmpty()) return;
-        
+
+        for (LedgerTransaction transaction : pendingTransactions)
+            transaction.setStatus(TransactionStatus.PROCESSING);
 
         Integer index = blockService.getNextIndex();
         String previousHash = blockService.getPreviousHash();
